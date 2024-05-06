@@ -166,3 +166,6 @@ Druk op de Capsule scroll naar je script -> Druk het plusje en sleep de Waypoint
 
 <figure><img src=".gitbook/assets/image (8).png" alt=""><figcaption><p>Waypoints</p></figcaption></figure>
 
+Part 2
+
+
