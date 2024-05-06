@@ -12,15 +12,11 @@ Ontwerp document van de game
 
 Open Unity en druk op new project rechts-boven, selecteer de 3D Built in render pipeline en geef je projetc een naam (B.v. : TowerDefense)
 
-
-
 ### Beginnen aan de game!
 
 Links onderen zie je de Scene SampleScene, verander de naam naar Level1
 
 <figure><img src=".gitbook/assets/image_2024-05-06_235622611.png" alt=""><figcaption><p>Naam veranderen naar Level1</p></figcaption></figure>
-
-
 
 Druk daarna van boven op Window -> Package Manager, Selecteer Unity Registry packages -> Typ AI Nav -> Selecteer en installeer de Ai navigation Package
 
@@ -30,17 +26,11 @@ Ga naar [deze link](https://assetstore.unity.com/packages/2d/textures-materials/
 
 Save je project en sluit het af start het daarna weer op. Dit is om de project te updaten met de nieuwe import van de AI navmesh package.
 
-
-
 Spawn nu de 3D object Plane in de level door in je Hierarchy Rechtermuis te klikken -> 3D object -> Plane. Spawn ook een Cube en een Capsule in
-
-
 
 <figure><img src=".gitbook/assets/NVIDIA_Overlay_q14cV3u2gn.png" alt=""><figcaption><p>Objecten in spawnen</p></figcaption></figure>
 
 Na het in spawnen van de objecten moet je de transform resetten. Dat doe je door het object te selecteren/klikken -> 3 stippen bij transform in de inspector -> Reset
-
-
 
 <figure><img src=".gitbook/assets/NVIDIA_Overlay_GlT2vNXIqe.png" alt=""><figcaption><p>Transform Resetten</p></figcaption></figure>
 
@@ -48,19 +38,13 @@ Door op reset te drukken gaan de objecten naar de world origin(0/midden punt)
 
 in dezelfde foto zie je de locatie van de materialen. Om die op je objecten te gebruiken moet je de gewenste material slepen naar het gewenste object.
 
-
-
 Maak de Plane groter door bij transform -> Scale en zet alle drie de axis(X,Y,Z) op 5
 
 Voor de Cube doe de Scale 2, 1, 2.
 
-
-
 Plaats de ingespawnde objecten in ongeveer zo een layout in de level.
 
 Maak daarna een empty object door weer rechter muis klik en dan 'Create Empty' boven 3d object, Noem de Empty "GameManager"
-
-
 
 <figure><img src=".gitbook/assets/NVIDIA_Overlay_Y5uwukQA77.png" alt=""><figcaption><p>Layout en GameManager</p></figcaption></figure>
 
@@ -88,27 +72,19 @@ Nadat je de layout heb gemaakt druk je op GameManager en Dan op Bake.
 
 Plaats de Capsule(Enemy) Op het blouwe vlakje wat is onstaan na het baken. Maak te Capsule ook wat kleiner door in de transform -> Scale 0.5, 0.5, 0.5
 
-
-
 Druk op de 1ste plek waar er een bocht is en dan maak je een Empty, Geef die de naam Waypoint
 
 <figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Waypoint</p></figcaption></figure>
 
-
-
 Maak in de assets tab een nieuwe folder met de naam Scripts
 
 <figure><img src=".gitbook/assets/image (4).png" alt=""><figcaption><p>Scripts folder</p></figcaption></figure>
-
-
 
 Maak in de Scripts folder een nieuwe C# Script en geef het de naam "EnemyController"
 
 Sleep de script op je Capsule in de hierarchy
 
 <figure><img src=".gitbook/assets/image (6).png" alt=""><figcaption><p>Script op de enemy zetten</p></figcaption></figure>
-
-
 
 Open de EnemyController script en plak dit erin
 
@@ -166,6 +142,5 @@ Druk op de Capsule scroll naar je script -> Druk het plusje en sleep de Waypoint
 
 <figure><img src=".gitbook/assets/image (8).png" alt=""><figcaption><p>Waypoints</p></figcaption></figure>
 
-Part 2
-
+### Enemy Wave Spawner
 
