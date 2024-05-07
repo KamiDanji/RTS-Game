@@ -1,4 +1,5 @@
 ---
+description: Inhoud
 cover: .gitbook/assets/Cover1 (1).avif
 coverY: 0
 layout:
@@ -17,9 +18,8 @@ layout:
     visible: true
 ---
 
-# GameDev Sprint Plannen
+# GameDev Sprint
 
-[**Voorbereiding**](voorbereiding.md)
-
-[**Sprint 1 Basic RTS Game**](rts-tower-defence-game.md)
+* [**Voorbereiding**](voorbereiding.md)
+* [**Sprint 1 Simple RTS Tower Defence Game**](rts-tower-defence-game.md)
 
