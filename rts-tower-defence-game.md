@@ -90,9 +90,9 @@ Druk nog een keer op de cube en dan in de inspector op layers en selecteer de la
 
 Nadat je dit heb gedaan sleep je de cube van je hieracrcy naar je assets
 
-<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Layers</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (10).png" alt=""><figcaption><p>Layers</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption><p>Prefab Maken</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (1) (1).png" alt=""><figcaption><p>Prefab Maken</p></figcaption></figure>
 
 #### GameManager Layer
 
@@ -106,7 +106,7 @@ Maak nu een simpele layout door de cube te sellecteren CTRL + D om dezelfde obje
 
 Nadat je de layout heb gemaakt druk je op GameManager en Dan op Bake.
 
-<figure><img src=".gitbook/assets/image (2).png" alt=""><figcaption><p>NavMesh Setup</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (2) (1).png" alt=""><figcaption><p>NavMesh Setup</p></figcaption></figure>
 
 
 
@@ -120,7 +120,7 @@ Plaats de Capsule(Enemy) Op het blauwe vlakje wat is onstaan na het baken. Maak 
 
 Druk op de 1ste plek waar er een bocht is en dan maak je een Empty, Geef die de naam Waypoint
 
-<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Waypoint</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (3) (1).png" alt=""><figcaption><p>Waypoint</p></figcaption></figure>
 
 
 
@@ -132,9 +132,9 @@ Maak in de Scripts folder een nieuwe C# Script en geef het de naam "EnemyControl
 
 Sleep de script op je Capsule in de hierarchy
 
-<figure><img src=".gitbook/assets/image (4).png" alt=""><figcaption><p>Scripts folder</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (4) (1).png" alt=""><figcaption><p>Scripts folder</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/image (6).png" alt=""><figcaption><p>Script op de enemy zetten</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (6) (1).png" alt=""><figcaption><p>Script op de enemy zetten</p></figcaption></figure>
 
 
 
@@ -194,13 +194,384 @@ Druk op CTRL + S en ga terug naar unity
 
 Druk op de Capsule scroll naar je script -> Druk het plusje en sleep de Waypoint of Waypoints object(en) van je hierarchy naar de waypoint in je script. Doe dit op de volgorde can je waypoints.
 
-<figure><img src=".gitbook/assets/image (8).png" alt=""><figcaption><p>Waypoints</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (8) (1).png" alt=""><figcaption><p>Waypoints</p></figcaption></figure>
 
 
 
 ### Enemy Wave Spawner
 
 Hier gaan we het Enemy Wave systeem maken om enemy's te spawnen in waves.
+
+
+
+#### Nieuwe Cube en Spawner
+
+Spawn een nieuwe Cube en zet die aan het begin van je Path(Waar de enemys gaan lopen).
+
+Maak de Cube ook groter door een scale van 3, 3, 3 te geven.
+
+Maak daarna een Empty en geef die de naam Spawner. Zet de Spawner op het begin van het pad op de NavMesh Surface( Blauwe strook op je path).
+
+<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Spawner setup</p></figcaption></figure>
+
+
+
+#### Spawner Script
+
+Maak een nieuwe C# Script in de Script folder en geef die de naam "Spawner".
+
+Sleep de Script daarna op de Spawner GameObject.
+
+Als je in de Inspector kijkt van de Spawner GameObject zou de script er moeten staan
+
+<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption><p>Spawner Script Op Spawner GameObject</p></figcaption></figure>
+
+Open de Spawner script en plak dit erin
+
+```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Spawner : MonoBehaviour
+{
+
+    public GameObject enemyPrefab;
+
+    public List<Transform> WayPoints;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        InvokeRepeating("Spawn", 1f, 0.5f);
+    }
+
+    void Spawn()
+    {
+        GameObject enemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
+        enemy.GetComponent<EnemyController>().SetDestination(WayPoints);
+    }
+}
+
+```
+
+
+
+Open Dan de EnemyController script en verander het naar de nieuwe script hieronder.
+
+```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+
+public class EnemyController : MonoBehaviour
+{
+
+    private List<Transform> WayPoints;
+    private int currentWayPointIndex = 0;
+    private float agentStoppingDistance = 0.3f;
+    private bool WayPointsSet = false;
+
+    NavMeshAgent agent;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        agent = GetComponent<NavMeshAgent>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (!WayPointsSet)
+        {
+            return;
+        }
+
+        if (!agent.pathPending && agent.remainingDistance <= agentStoppingDistance)
+        {
+            if (currentWayPointIndex == WayPoints.Count - 1)
+            {
+                Destroy(this.gameObject, 0.1f);
+            }
+            else
+            {
+                currentWayPointIndex++;
+                agent.SetDestination(WayPoints[currentWayPointIndex].position);
+            }
+        }
+    }
+
+
+public void SetDestination(List<Transform> wayPoints)
+    {
+        this.WayPoints = wayPoints;
+        WayPointsSet = true;
+    }
+}
+
+```
+
+#### Capsule/Enemy Prefab
+
+Sleep de Capsule vanuit de Hieracrhy naar de assets tab om de capsule een prefab te maken dat hebben we nodig voor de spawner.
+
+verwijder daarna de capsule uit de hierarchy.
+
+<figure><img src=".gitbook/assets/image (2).png" alt=""><figcaption><p>Capsule/Enemy Prefab maken</p></figcaption></figure>
+
+
+
+Klik op de spawner en druk op het slotje dat bij de inspector staat.
+
+Sleep daarna de Capsule Prefab van de Assets window naar 'Enemy Prefab'.
+
+Sellecteer daarna je waypoints door CTRL ingedrukt te houden en je waypoints te klikken en sleep ze dan naar het woord 'Way Points' in de inspector.
+
+druk nadat weer op het slotje bij de inspector om het paneel weer te unlocken.
+
+<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Spawner setup</p></figcaption></figure>
+
+
+
+#### Play test
+
+Als je alle stappen tot nu toe goed hebt uitgevoerd en je drukt op play in de editor zou: Enemy's spawnen -> gaan naar de waypoint -> Bij de laatste Waypoint gaan de enemys kapot.
+
+<figure><img src=".gitbook/assets/image (4).png" alt=""><figcaption><p>project in werking</p></figcaption></figure>
+
+
+
+### Level Manager
+
+Open de Spawner script en verander het naar dit
+
+```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Spawner : MonoBehaviour
+{
+
+    public GameObject enemyPrefab;
+    public float spawnRate = 0.5f;
+    public int maxCount = 10;
+    private int count = 0;
+    public List<Transform> WayPoints;
+
+
+    // ReSharper disable Unity.PerformanceAnalysis
+    void Spawn()
+    {
+        GameObject enemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
+        enemy.GetComponent<EnemyController>().SetDestination(WayPoints);
+
+        count++;
+
+        if (count >= maxCount)
+        {
+            CancelInvoke("Spawn");
+        }
+    }
+
+    public void StartNextWave()
+    {
+        count = 0;
+        InvokeRepeating("Spawn", 1, spawnRate);
+    }
+
+    public void StopSpawning()
+    {
+        CancelInvoke("Spawn");
+    }
+}
+
+```
+
+
+
+Spawn een Empty object in en geef die de naam "LevelManager"
+
+maak een nieuwe script en geef die ook de naam "LevelManager"
+
+sleep de script naar de empty gameobject.
+
+<figure><img src=".gitbook/assets/image (6).png" alt=""><figcaption><p>LevelManager</p></figcaption></figure>
+
+Open de LevelManager Script en plak dit erin
+
+```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class LevelManager : MonoBehaviour
+{
+
+    public int maxWave = 5;
+    private int currentWave = 0;
+    private bool isSpawning = false;
+    private int enemiesRemaining = 0;
+    private float timer = 0f;
+    public float waveSpawnInterval = 45f;
+
+    public Spawner spawner;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        StartNextWave();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (isSpawning)
+        {
+            // While the wave is spawning, keep the timer to 0
+            timer = 0f;
+        }
+        else
+        {
+            //If we are not spawning, start the timer
+            timer -= Time.deltaTime;
+            if (timer <= 0)
+            {
+                if (currentWave >= maxWave)
+                {
+                    // reached the max wave, stop spawning
+                    StopSpawning();
+                }
+                else
+                {
+                    StartNextWave();
+                }
+            }
+        }
+    }
+
+    public void EnemyDestroyed()
+    {
+        enemiesRemaining--;
+        if (enemiesRemaining == 0)
+        {
+            isSpawning = false;
+            // All enemies have been destroyed, reset timer to waveSpawnInterval
+            timer = waveSpawnInterval;
+        }
+    }
+
+    void StartNextWave()
+    {
+        currentWave++;
+        spawner.StartNextWave();
+        enemiesRemaining = spawner.maxCount;
+        isSpawning = true;
+    }
+
+    void StopSpawning()
+    {
+        spawner.StopSpawning();
+        isSpawning = false;
+    }
+}
+
+```
+
+####
+
+#### EnemyController
+
+Open de EnemyController Script en verander dat naar dit
+
+```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+
+public class EnemyController : MonoBehaviour
+{
+
+    public LevelManager levelManager; // Reference to the level manager
+    private List<Transform> WayPoints;
+    private int currentWayPointIndex = 0;
+    private float agentStoppingDistance = 0.3f;
+    private bool WayPointsSet = false;
+
+    NavMeshAgent agent;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        agent = GetComponent<NavMeshAgent>();
+        levelManager = FindObjectOfType<LevelManager>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (!WayPointsSet)
+        {
+            return;
+        }
+
+        if (!agent.pathPending && agent.remainingDistance <= agentStoppingDistance)
+        {
+            if (currentWayPointIndex == WayPoints.Count - 1)
+            {
+                levelManager.EnemyDestroyed();
+                Destroy(this.gameObject, 0.1f);
+            }
+            else
+            {
+                currentWayPointIndex++;
+                agent.SetDestination(WayPoints[currentWayPointIndex].position);
+            }
+        }
+    }
+
+
+public void SetDestination(List<Transform> wayPoints)
+    {
+        this.WayPoints = wayPoints;
+        WayPointsSet = true;
+    }
+}
+
+```
+
+
+
+#### Spawner naar LevelManager
+
+Sleep de GameObject Spawner naar het tabje Spawner in de LevelManager Script op de LevelManager GameObject
+
+<figure><img src=".gitbook/assets/image (7).png" alt=""><figcaption><p>LevelManager</p></figcaption></figure>
+
+LevelManager Script:&#x20;
+
+Max Wave: Hoevel golven van vijander er zijn.
+
+Wave Spawn Interval: Hoelang het duurt voordat de volgende golf start.
+
+
+
+### Turrets
+
+
+
+#### Tags
+
+Druk op de Cube -> in de inspector op Tags -> Add Tag. -> druk op het '+' om een tag te maken. Noem de tag "Platform". Maak er nog een en noem die "Occupied"
+
+<figure><img src=".gitbook/assets/image (8).png" alt=""><figcaption><p>Tags</p></figcaption></figure>
+
+<figure><img src=".gitbook/assets/image (9).png" alt=""><figcaption><p>Tags</p></figcaption></figure>
+
+
 
 [^1]: #### Unity Scenes Uitgelegd
 
