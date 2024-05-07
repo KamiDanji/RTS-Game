@@ -573,6 +573,86 @@ Druk op de Cube -> in de inspector op Tags -> Add Tag. -> druk op het '+' om een
 
 
 
+#### Camera Movement
+
+maak een C# en geef die de naam CameraController en plak dit erin.
+
+```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CameraController : MonoBehaviour
+{
+    public float speed = 10.0f; // snelheid van de camera
+    public float sensitivity = 0.1f; // gevoeligheid van de muis
+    private float pitch = 0f; // verticale rotatie van de camera
+
+    void Start()
+    {
+        // Vergrendel en verberg de cursor wanneer het spel start
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    void Update()
+    {
+        // Wissel cursor zichtbaarheid en vergrendelingsstatus wanneer de linker Alt-toets wordt ingedrukt
+        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        {
+            if (Cursor.lockState == CursorLockMode.Locked)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
+
+        // Als de cursor is vergrendeld, sta camerabeweging toe
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            // Haal de nieuwe positie van de muis op ten opzichte van de vorige positie
+            Vector3 delta = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0);
+
+            // Roteer de camera op basis van de muisbeweging
+            pitch -= delta.y * sensitivity;
+            pitch = Mathf.Clamp(pitch, -90f, 90f);
+
+            Quaternion targetRotation = Quaternion.Euler(pitch, transform.localEulerAngles.y + delta.x * sensitivity, 0f);
+            transform.localRotation = targetRotation;
+
+            Vector3 dir = new Vector3();
+            if (Input.GetKey(KeyCode.W)) dir += transform.forward; // Vooruit bewegen
+            if (Input.GetKey(KeyCode.S)) dir -= transform.forward; // Achteruit bewegen
+            if (Input.GetKey(KeyCode.A)) dir -= transform.right; // Naar links bewegen
+            if (Input.GetKey(KeyCode.D)) dir += transform.right; // Naar rechts bewegen
+
+            // Controleer of de spatiebalk wordt ingedrukt
+            if (Input.GetKey(KeyCode.Space))
+            {
+                dir += Vector3.up; // Omhoog bewegen
+            }
+
+            // Controleer of de Ctrl-toets wordt ingedrukt
+            if (Input.GetKey(KeyCode.LeftControl))
+            {
+                dir -= Vector3.up; // Omlaag bewegen
+            }
+
+            dir.Normalize(); // Normaliseer de richtingsvector
+            dir *= speed * Time.deltaTime; // Schaal de richtingsvector met snelheid en tijd
+
+            // Beweeg de camera
+            transform.Translate(dir, Space.World);
+        }
+    }
+}
+```
+
 [^1]: #### Unity Scenes Uitgelegd
 
     Unity Scenes zijn  individuele levels of stages in een game, elk met hun eigen objecten en instellingen. Ze worden gebruikt om verschillende delen van een game, zoals levels of de mainmenu, te organiseren. Hiermee kun je efficiënt tussen verschillende onderdelen van je game wisselen en het ontwikkelproces overzichtelijk houden.
