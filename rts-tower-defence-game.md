@@ -114,6 +114,10 @@ Nadat je de layout heb gemaakt druk je op GameManager en Dan op Bake.
 
 Plaats de Capsule(Enemy) Op het blauwe vlakje wat is onstaan na het baken. Maak de Capsule ook wat kleiner door in de transform -> Scale 0.5, 0.5, 0.5
 
+Ga naar de inspecotr en voeg de NavMeshAgent toen aan de Capsule. Dit heb je nodig zodat de capsule kan navigeren op het terrain
+
+<figure><img src=".gitbook/assets/image (11).png" alt=""><figcaption><p>NavMeshAgent</p></figcaption></figure>
+
 
 
 #### Waypoint
