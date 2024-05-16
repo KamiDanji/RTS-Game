@@ -664,6 +664,36 @@ Wave Spawn Interval: Hoelang het duurt voordat de volgende golf start.
 
 
 
+### Main menu
+
+ga naar je scenes mapje en maak een nieuwe scene, Geef deze de naam MainMenu
+
+
+
+<figure><img src=".gitbook/assets/image (12).png" alt=""><figcaption><p>Main Menu</p></figcaption></figure>
+
+open de MainMenu Scene, maak een nieuwe canvas&#x20;
+
+<figure><img src=".gitbook/assets/image (13).png" alt=""><figcaption></figcaption></figure>
+
+na het maken van het canvas maak je een button in de canvas druk daarna op import tmp essentials
+
+<figure><img src=".gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
+
+<figure><img src=".gitbook/assets/image (15).png" alt=""><figcaption></figcaption></figure>
+
+Verander de text van de button naar 'PlayButton' en verander de text in de button naar 'play'&#x20;
+
+<figure><img src=".gitbook/assets/image (18).png" alt=""><figcaption></figcaption></figure>
+
+<figure><img src=".gitbook/assets/image (17).png" alt=""><figcaption></figcaption></figure>
+
+maak een empty en geef die de naam 'MainMenuManager'
+
+maak een C# script met dezelfde naam
+
+<figure><img src=".gitbook/assets/image (19).png" alt=""><figcaption></figcaption></figure>
+
 ### Turrets
 
 
