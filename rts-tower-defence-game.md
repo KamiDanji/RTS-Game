@@ -672,31 +672,118 @@ ga naar je scenes mapje en maak een nieuwe scene, Geef deze de naam MainMenu
 
 <figure><img src=".gitbook/assets/image (12).png" alt=""><figcaption><p>Main Menu</p></figcaption></figure>
 
-open de MainMenu Scene, maak een nieuwe canvas&#x20;
 
-<figure><img src=".gitbook/assets/image (13).png" alt=""><figcaption></figcaption></figure>
+
+open de MainMenu Scene, maak een nieuwe canvas&#x20;
 
 na het maken van het canvas maak je een button in de canvas druk daarna op import tmp essentials
 
-<figure><img src=".gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
+{% hint style="warning" %}
+Zorg dat de UI elementen(Zoals de button) In de Canvas zitten.
+{% endhint %}
 
-<figure><img src=".gitbook/assets/image (15).png" alt=""><figcaption></figcaption></figure>
+
+
+<figure><img src=".gitbook/assets/image (13).png" alt=""><figcaption><p>Canvas</p></figcaption></figure>
+
+<figure><img src=".gitbook/assets/image (14).png" alt=""><figcaption><p>Button in canvas</p></figcaption></figure>
+
+<figure><img src=".gitbook/assets/image (15).png" alt=""><figcaption><p>TMP Essentials</p></figcaption></figure>
+
+
+
+#### Buttons
 
 Verander de text van de button naar 'PlayButton' en verander de text in de button naar 'play'&#x20;
 
-<figure><img src=".gitbook/assets/image (18).png" alt=""><figcaption></figcaption></figure>
+Copieer de knop en plak hem nog 2 keer.
 
-<figure><img src=".gitbook/assets/image (17).png" alt=""><figcaption></figcaption></figure>
+Verander de naam van de buttons naar: Levels, Quit. Doe dit ook voor de bijbehorende text.
+
+<figure><img src=".gitbook/assets/image (18).png" alt=""><figcaption><p>Button</p></figcaption></figure>
+
+<figure><img src=".gitbook/assets/image (17).png" alt=""><figcaption><p> ButtonText</p></figcaption></figure>
+
+
+
+#### MainMenuManager
 
 maak een empty en geef die de naam 'MainMenuManager'
 
 maak een C# script met dezelfde naam
 
-<figure><img src=".gitbook/assets/image (19).png" alt=""><figcaption></figcaption></figure>
+sleep het script naar de MainMenuManger empty
+
+<figure><img src=".gitbook/assets/image (19).png" alt=""><figcaption><p>Script naar MainMenuManager Empty</p></figcaption></figure>
+
+
+
+Open de MainMenuManager C# script en plak dit erin
+
+{% code fullWidth="false" %}
+```csharp
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class MainMenuManager : MonoBehaviour
+{
+    public void OnPlayButtonClicked()
+    {
+        // Laad level1 wanneer de play-knop wordt ingedrukt
+        SceneManager.LoadScene("Level1");
+    }
+
+    public void OnLevelsButtonClicked()
+    {
+        // Laad het levelscherm wanneer de levels-knop wordt ingedrukt
+        SceneManager.LoadScene("Levels");
+    }
+
+    public void OnQuitButtonClicked()
+    {
+        // Sluit het spel af wanneer de quit-knop wordt ingedrukt
+        Application.Quit();
+    }
+}
+
+```
+{% endcode %}
+
+
+
+Druk op de PlayButton, Scroll in de inspector naar de button tab, Druk op het "+" en sleep daarna de MainMenuManager Empty naar het vakje.
+
+Doe dit voor elke Button.
+
+<figure><img src=".gitbook/assets/image (20).png" alt=""><figcaption><p>MainMenuManager op Buttons</p></figcaption></figure>
+
+
+
+Druk daarna op het knopje waar staat "No Functions "-> MainMenuManager -> OnPlayButtonClicked( )
+
+kies de bijbehorende functies.
+
+Playbutton = OnPlayButtonClicked( )
+
+LevelsButton = OnLevelsButtonClicked( )
+
+QuitButton = OnQuitButtonClicked( )
+
+<figure><img src=".gitbook/assets/image (22).png" alt=""><figcaption><p>Button Functions</p></figcaption></figure>
+
+
+
+#### Levels Scene
+
+Maak in de Scenes folder een nieuwe scene en geef deze de naam Levels.
+
+Hier gaan we een level kunnen sellecteren om te kunnen spelen.
+
+Hier komen we later op terug.
+
+
 
 ### Turrets
-
-
 
 #### Tags
 
