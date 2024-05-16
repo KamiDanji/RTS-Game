@@ -12,6 +12,10 @@ Ontwerp document van de game
 Gebruik de screenshots voor meer duidelijkheid&#x20;
 {% endhint %}
 
+{% hint style="info" %}
+Ik heb comments bij de code gezet zodat je begrijpt wat het doet
+{% endhint %}
+
 ### Project creatie
 
 Open Unity en druk op new project rechts-boven, selecteer de 3D Built in render pipeline en geef je projetc een naam (B.v. : TowerDefense)
@@ -154,37 +158,50 @@ using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
-
+    // Lijst van waypoints waar de vijand naartoe moet gaan
     public List<Transform> WayPoints;
+    
+    // Index van het huidige waypoint waar de vijand naartoe gaat
     private int currentWayPointIndex = 0;
+    
+    // De afstand waarop de vijand stopt bij een waypoint
     private float agentStoppingDistance = 0.3f;
     
+    // Referentie naar de NavMeshAgent component
     NavMeshAgent agent;
 
-    // Start is called before the first frame update
+    // Start wordt aangeroepen voordat de eerste frame update
     void Start()
     {
+        // Controleer of er waypoints zijn
         if (WayPoints.Count == 0)
         {
-            Debug.Log("There are no waypoints");
-            return;
+            Debug.Log("Er zijn geen waypoints");
+            return; // Stop als er geen waypoints zijn
         }
 
+        // Haal de NavMeshAgent component op
         agent = GetComponent<NavMeshAgent>();
+        
+        // Stel de bestemming in op het eerste waypoint
         agent.SetDestination(WayPoints[currentWayPointIndex].position);
     }
 
-    // Update is called once per frame
+    // Update wordt een keer per frame aangeroepen
     void Update()
     {
+        // Controleer of het pad niet meer bezig is en de agent bijna bij het huidige waypoint is
         if (!agent.pathPending && agent.remainingDistance <= agentStoppingDistance)
         {
+            // Als de agent bij het laatste waypoint is
             if (currentWayPointIndex == WayPoints.Count - 1)
             {
+                // Vernietig het object na 0.1 seconden
                 Destroy(this.gameObject, 0.1f);
             }
             else
             {
+                // Ga naar het volgende waypoint
                 currentWayPointIndex++;
                 agent.SetDestination(WayPoints[currentWayPointIndex].position);
             }
@@ -239,20 +256,26 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-
+    // Prefab van de vijand die gespawned moet worden
     public GameObject enemyPrefab;
 
+    // Lijst van waypoints waar de vijand naartoe moet gaan
     public List<Transform> WayPoints;
 
-    // Start is called before the first frame update
+    // Start wordt aangeroepen voordat de eerste frame update
     void Start()
     {
+        // Roep de Spawn functie herhaaldelijk aan, begint na 1 seconde en herhaalt elke 0.5 seconden
         InvokeRepeating("Spawn", 1f, 0.5f);
     }
 
+    // Spawn een vijand en stel de waypoints in
     void Spawn()
     {
+        // Maak een nieuwe vijand aan op de positie van de spawner met geen rotatie
         GameObject enemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
+        
+        // Stel de waypoints in voor de vijand
         enemy.GetComponent<EnemyController>().SetDestination(WayPoints);
     }
 }
@@ -271,47 +294,66 @@ using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
-
+    // Lijst van waypoints waar de vijand naartoe moet gaan
     private List<Transform> WayPoints;
+    
+    // Index van het huidige waypoint waar de vijand naartoe gaat
     private int currentWayPointIndex = 0;
+    
+    // De afstand waarop de vijand stopt bij een waypoint
     private float agentStoppingDistance = 0.3f;
+    
+    // Boolean om te controleren of de waypoints zijn ingesteld
     private bool WayPointsSet = false;
 
+    // Referentie naar de NavMeshAgent component
     NavMeshAgent agent;
 
-    // Start is called before the first frame update
+    // Start wordt aangeroepen voordat de eerste frame update
     void Start()
     {
+        // Haal de NavMeshAgent component op
         agent = GetComponent<NavMeshAgent>();
     }
 
-    // Update is called once per frame
+    // Update wordt een keer per frame aangeroepen
     void Update()
     {
+        // Controleer of de waypoints zijn ingesteld
         if (!WayPointsSet)
         {
-            return;
+            return; // Doe niets als de waypoints nog niet zijn ingesteld
         }
 
+        // Controleer of het pad niet meer bezig is en de agent bijna bij het huidige waypoint is
         if (!agent.pathPending && agent.remainingDistance <= agentStoppingDistance)
         {
+            // Als de agent bij het laatste waypoint is
             if (currentWayPointIndex == WayPoints.Count - 1)
             {
+                // Vernietig het object na 0.1 seconden
                 Destroy(this.gameObject, 0.1f);
             }
             else
             {
+                // Ga naar het volgende waypoint
                 currentWayPointIndex++;
                 agent.SetDestination(WayPoints[currentWayPointIndex].position);
             }
         }
     }
 
-
-public void SetDestination(List<Transform> wayPoints)
+    // Methode om waypoints in te stellen van buitenaf
+    public void SetDestination(List<Transform> wayPoints)
     {
-        this.WayPoints = wayPoints;
-        WayPointsSet = true;
+        this.WayPoints = wayPoints; // Stel de waypoints in
+        WayPointsSet = true; // Markeer dat de waypoints zijn ingesteld
+
+        // Stel de bestemming in op het eerste waypoint
+        if (WayPoints.Count > 0)
+        {
+            agent.SetDestination(WayPoints[currentWayPointIndex].position);
+        }
     }
 }
 
@@ -358,34 +400,52 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-
+    // Prefab van de vijand die gespawned moet worden
     public GameObject enemyPrefab;
+    
+    // Snelheid waarmee vijanden gespawned worden (in seconden)
     public float spawnRate = 0.5f;
+    
+    // Maximaal aantal vijanden dat gespawned wordt in een golf
     public int maxCount = 10;
+    
+    // Huidig aantal gespawnede vijanden
     private int count = 0;
+    
+    // Lijst van waypoints waar de vijand naartoe moet gaan
     public List<Transform> WayPoints;
 
-
+    // Methode om een vijand te spawnen
     // ReSharper disable Unity.PerformanceAnalysis
     void Spawn()
     {
+        // Maak een nieuwe vijand aan op de positie van de spawner zonder rotatie
         GameObject enemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
+        
+        // Stel de waypoints in voor de vijand
         enemy.GetComponent<EnemyController>().SetDestination(WayPoints);
 
+        // Verhoog het aantal gespawnede vijanden
         count++;
 
+        // Stop met spawnen als het maximale aantal is bereikt
         if (count >= maxCount)
         {
             CancelInvoke("Spawn");
         }
     }
 
+    // Methode om een nieuwe golf van vijanden te starten
     public void StartNextWave()
     {
+        // Reset het aantal gespawnede vijanden
         count = 0;
-        InvokeRepeating("Spawn", 1, spawnRate);
+
+        // Begin met herhaaldelijk spawnen van vijanden
+        InvokeRepeating("Spawn", 1f, spawnRate);
     }
 
+    // Methode om het spawnen te stoppen
     public void StopSpawning()
     {
         CancelInvoke("Spawn");
@@ -413,60 +473,75 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
-
+    // Maximale aantal golven
     public int maxWave = 5;
+    
+    // Huidige golf
     private int currentWave = 0;
+    
+    // Boolean om bij te houden of er gespawned wordt
     private bool isSpawning = false;
+    
+    // Aantal vijanden dat nog over is
     private int enemiesRemaining = 0;
+    
+    // Timer voor het interval tussen golven
     private float timer = 0f;
+    
+    // Interval tussen golven in seconden
     public float waveSpawnInterval = 45f;
 
+    // Referentie naar de Spawner component
     public Spawner spawner;
 
-    // Start is called before the first frame update
+    // Start wordt aangeroepen voordat de eerste frame update
     void Start()
     {
+        // Start de eerste golf
         StartNextWave();
     }
 
-    // Update is called once per frame
+    // Update wordt een keer per frame aangeroepen
     void Update()
     {
         if (isSpawning)
         {
-            // While the wave is spawning, keep the timer to 0
+            // Als er gespawned wordt, reset de timer naar 0
             timer = 0f;
         }
         else
         {
-            //If we are not spawning, start the timer
+            // Als er niet gespawned wordt, start de timer
             timer -= Time.deltaTime;
             if (timer <= 0)
             {
                 if (currentWave >= maxWave)
                 {
-                    // reached the max wave, stop spawning
+                    // Als de maximale golf is bereikt, stop met spawnen
                     StopSpawning();
                 }
                 else
                 {
+                    // Start de volgende golf
                     StartNextWave();
                 }
             }
         }
     }
 
+    // Methode die wordt aangeroepen wanneer een vijand wordt vernietigd
     public void EnemyDestroyed()
     {
         enemiesRemaining--;
         if (enemiesRemaining == 0)
         {
+            // Als alle vijanden zijn vernietigd, stop met spawnen en reset de timer
             isSpawning = false;
-            // All enemies have been destroyed, reset timer to waveSpawnInterval
             timer = waveSpawnInterval;
         }
     }
 
+    // Methode om de volgende golf te starten
     void StartNextWave()
     {
         currentWave++;
@@ -475,6 +550,7 @@ public class LevelManager : MonoBehaviour
         isSpawning = true;
     }
 
+    // Methode om het spawnen te stoppen
     void StopSpawning()
     {
         spawner.StopSpawning();
@@ -498,50 +574,75 @@ using UnityEngine.AI;
 
 public class EnemyController : MonoBehaviour
 {
+    // Referentie naar de LevelManager
+    public LevelManager levelManager;
 
-    public LevelManager levelManager; // Reference to the level manager
+    // Lijst van waypoints waar de vijand naartoe moet gaan
     private List<Transform> WayPoints;
+
+    // Index van het huidige waypoint waar de vijand naartoe gaat
     private int currentWayPointIndex = 0;
+
+    // De afstand waarop de vijand stopt bij een waypoint
     private float agentStoppingDistance = 0.3f;
+
+    // Boolean om te controleren of de waypoints zijn ingesteld
     private bool WayPointsSet = false;
 
+    // Referentie naar de NavMeshAgent component
     NavMeshAgent agent;
 
-    // Start is called before the first frame update
+    // Start wordt aangeroepen voordat de eerste frame update
     void Start()
     {
+        // Haal de NavMeshAgent component op
         agent = GetComponent<NavMeshAgent>();
+
+        // Zoek de LevelManager in de scene en stel de referentie in
         levelManager = FindObjectOfType<LevelManager>();
     }
 
-    // Update is called once per frame
+    // Update wordt een keer per frame aangeroepen
     void Update()
     {
+        // Controleer of de waypoints zijn ingesteld
         if (!WayPointsSet)
         {
-            return;
+            return; // Doe niets als de waypoints nog niet zijn ingesteld
         }
 
+        // Controleer of het pad niet meer bezig is en de agent bijna bij het huidige waypoint is
         if (!agent.pathPending && agent.remainingDistance <= agentStoppingDistance)
         {
+            // Als de agent bij het laatste waypoint is
             if (currentWayPointIndex == WayPoints.Count - 1)
             {
+                // Informeer de LevelManager dat een vijand is vernietigd
                 levelManager.EnemyDestroyed();
+
+                // Vernietig het object na 0.1 seconden
                 Destroy(this.gameObject, 0.1f);
             }
             else
             {
+                // Ga naar het volgende waypoint
                 currentWayPointIndex++;
                 agent.SetDestination(WayPoints[currentWayPointIndex].position);
             }
         }
     }
 
-
-public void SetDestination(List<Transform> wayPoints)
+    // Methode om waypoints in te stellen van buitenaf
+    public void SetDestination(List<Transform> wayPoints)
     {
-        this.WayPoints = wayPoints;
-        WayPointsSet = true;
+        this.WayPoints = wayPoints; // Stel de waypoints in
+        WayPointsSet = true; // Markeer dat de waypoints zijn ingesteld
+
+        // Stel de bestemming in op het eerste waypoint
+        if (WayPoints.Count > 0)
+        {
+            agent.SetDestination(WayPoints[currentWayPointIndex].position);
+        }
     }
 }
 
@@ -588,9 +689,14 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public float speed = 10.0f; // snelheid van de camera
-    public float sensitivity = 0.1f; // gevoeligheid van de muis
-    private float pitch = 0f; // verticale rotatie van de camera
+    // Snelheid van de camera
+    public float speed = 10.0f;
+
+    // Gevoeligheid van de muis
+    public float sensitivity = 0.1f;
+
+    // Verticale rotatie van de camera
+    private float pitch = 0f;
 
     void Start()
     {
@@ -606,11 +712,13 @@ public class CameraController : MonoBehaviour
         {
             if (Cursor.lockState == CursorLockMode.Locked)
             {
+                // Ontgrendel en toon de cursor
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
             else
             {
+                // Vergrendel en verberg de cursor
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
             }
@@ -624,28 +732,20 @@ public class CameraController : MonoBehaviour
 
             // Roteer de camera op basis van de muisbeweging
             pitch -= delta.y * sensitivity;
-            pitch = Mathf.Clamp(pitch, -90f, 90f);
+            pitch = Mathf.Clamp(pitch, -90f, 90f); // Beperk de pitch rotatie tussen -90 en 90 graden
 
+            // Bereken de doelrotatie van de camera
             Quaternion targetRotation = Quaternion.Euler(pitch, transform.localEulerAngles.y + delta.x * sensitivity, 0f);
-            transform.localRotation = targetRotation;
+            transform.localRotation = targetRotation; // Pas de rotatie toe op de camera
 
+            // Bereken de bewegingsrichting van de camera
             Vector3 dir = new Vector3();
             if (Input.GetKey(KeyCode.W)) dir += transform.forward; // Vooruit bewegen
             if (Input.GetKey(KeyCode.S)) dir -= transform.forward; // Achteruit bewegen
             if (Input.GetKey(KeyCode.A)) dir -= transform.right; // Naar links bewegen
             if (Input.GetKey(KeyCode.D)) dir += transform.right; // Naar rechts bewegen
-
-            // Controleer of de spatiebalk wordt ingedrukt
-            if (Input.GetKey(KeyCode.Space))
-            {
-                dir += Vector3.up; // Omhoog bewegen
-            }
-
-            // Controleer of de Ctrl-toets wordt ingedrukt
-            if (Input.GetKey(KeyCode.LeftControl))
-            {
-                dir -= Vector3.up; // Omlaag bewegen
-            }
+            if (Input.GetKey(KeyCode.Space)) dir += Vector3.up; // Omhoog bewegen
+            if (Input.GetKey(KeyCode.LeftControl)) dir -= Vector3.up; // Omlaag bewegen
 
             dir.Normalize(); // Normaliseer de richtingsvector
             dir *= speed * Time.deltaTime; // Schaal de richtingsvector met snelheid en tijd
@@ -655,6 +755,7 @@ public class CameraController : MonoBehaviour
         }
     }
 }
+
 ```
 
 [^1]: #### Unity Scenes Uitgelegd
