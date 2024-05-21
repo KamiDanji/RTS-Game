@@ -32,6 +32,92 @@ Links onderen zie je de [Scene ](#user-content-fn-1)[^1]SampleScene, verander de
 
 
 
+#### Camera Movement
+
+maak een C# en geef die de naam CameraController en plak dit erin.
+
+Sleep de script op de Main Camera
+
+met deze script kan je WASD gebruiken om te bewegen in de game
+
+```csharp
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CameraController : MonoBehaviour
+{
+    // Snelheid van de camera
+    public float speed = 10.0f;
+
+    // Gevoeligheid van de muis
+    public float sensitivity = 0.1f;
+
+    // Verticale rotatie van de camera
+    private float pitch = 0f;
+
+    void Start()
+    {
+        // Vergrendel en verberg de cursor wanneer het spel start
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    void Update()
+    {
+        // Wissel cursor zichtbaarheid en vergrendelingsstatus wanneer de linker Alt-toets wordt ingedrukt
+        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        {
+            if (Cursor.lockState == CursorLockMode.Locked)
+            {
+                // Ontgrendel en toon de cursor
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+            else
+            {
+                // Vergrendel en verberg de cursor
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
+
+        // Als de cursor is vergrendeld, sta camerabeweging toe
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            // Haal de nieuwe positie van de muis op ten opzichte van de vorige positie
+            Vector3 delta = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0);
+
+            // Roteer de camera op basis van de muisbeweging
+            pitch -= delta.y * sensitivity;
+            pitch = Mathf.Clamp(pitch, -90f, 90f); // Beperk de pitch rotatie tussen -90 en 90 graden
+
+            // Bereken de doelrotatie van de camera
+            Quaternion targetRotation = Quaternion.Euler(pitch, transform.localEulerAngles.y + delta.x * sensitivity, 0f);
+            transform.localRotation = targetRotation; // Pas de rotatie toe op de camera
+
+            // Bereken de bewegingsrichting van de camera
+            Vector3 dir = new Vector3();
+            if (Input.GetKey(KeyCode.W)) dir += transform.forward; // Vooruit bewegen
+            if (Input.GetKey(KeyCode.S)) dir -= transform.forward; // Achteruit bewegen
+            if (Input.GetKey(KeyCode.A)) dir -= transform.right; // Naar links bewegen
+            if (Input.GetKey(KeyCode.D)) dir += transform.right; // Naar rechts bewegen
+            if (Input.GetKey(KeyCode.Space)) dir += Vector3.up; // Omhoog bewegen
+            if (Input.GetKey(KeyCode.LeftControl)) dir -= Vector3.up; // Omlaag bewegen
+
+            dir.Normalize(); // Normaliseer de richtingsvector
+            dir *= speed * Time.deltaTime; // Schaal de richtingsvector met snelheid en tijd
+
+            // Beweeg de camera
+            transform.Translate(dir, Space.World);
+        }
+    }
+}
+
+```
+
+
+
 #### Packages, AI Navmesh, Gridbox Materials
 
 Druk daarna van boven op Window -> Package Manager, Selecteer Unity Registry packages -> Typ AI Nav -> Selecteer en installeer de Ai navigation Package
@@ -795,84 +881,103 @@ Druk op de Cube -> in de inspector op Tags -> Add Tag. -> druk op het '+' om een
 
 
 
-#### Camera Movement
+#### Tower/Cannon Assets.
 
-maak een C# en geef die de naam CameraController en plak dit erin.
+Download de Toren en cannon van [Deze Link](https://www.mediafire.com/file/hpbdu9z86fxand9/tower-defense-assets.zip/file) Dit zijn zelf gemaakte 3d modellen(Zien er slecht uit, Maar het werkt).
+
+Pak de Zip file uit en sleep het mapje "SDAssets" naar het Assets tabje in Unity.
+
+ga in het sdAssets mapje en sleep 1 of meerdere torens op de plaatsen waar je wilt dat de torens staan.
+
+Selecteer al je torens die in je scene staan en geef ze de "Platform" Tag.
+
+
+
+<figure><img src=".gitbook/assets/image (23).png" alt=""><figcaption><p>Platform tag</p></figcaption></figure>
+
+
+
+Maak een nieuwe C# Script en geef die de naam "UIInterface"
+
+Sleep de script op de LevelManager.
+
+Plak daarna dit in de script.
+
+Met deze script ga je het cannon kunnen plaatsen op de torens door Linker muisklik ingedrukt te houden en los te laten wanneer je op een toren gericht staat.
 
 ```csharp
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class UIInterface : MonoBehaviour
 {
-    // Snelheid van de camera
-    public float speed = 10.0f;
+    public GameObject Cannon; // Het kanon GameObject dat geplaatst moet worden
 
-    // Gevoeligheid van de muis
-    public float sensitivity = 0.1f;
+    GameObject focusObs; // Het huidige focus object (het kanon dat geplaatst wordt)
 
-    // Verticale rotatie van de camera
-    private float pitch = 0f;
+    public float heightOffset = 0.0f; // De hoogte offset voor het plaatsen van het kanon
 
-    void Start()
-    {
-        // Vergrendel en verberg de cursor wanneer het spel start
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-    }
-
+    // Update wordt elke frame aangeroepen
     void Update()
     {
-        // Wissel cursor zichtbaarheid en vergrendelingsstatus wanneer de linker Alt-toets wordt ingedrukt
-        if (Input.GetKeyDown(KeyCode.LeftAlt))
+        if (Input.GetMouseButtonDown(0)) // Als de linkermuisknop wordt ingedrukt
         {
-            if (Cursor.lockState == CursorLockMode.Locked)
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (!Physics.Raycast(ray, out hit)) // Als de raycast niets raakt, stop dan de functie
             {
-                // Ontgrendel en toon de cursor
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
+                return;
             }
-            else
-            {
-                // Vergrendel en verberg de cursor
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-            }
+            // Maak een nieuw kanon op de plek waar de raycast iets raakt
+            focusObs = Instantiate(Cannon, hit.point, Cannon.transform.rotation);
+            // Schakel de collider van het kanon uit
+            focusObs.GetComponent<Collider>().enabled = false;
         }
-
-        // Als de cursor is vergrendeld, sta camerabeweging toe
-        if (Cursor.lockState == CursorLockMode.Locked)
+        else if (Input.GetMouseButton(0)) // Als de linkermuisknop wordt ingehouden
         {
-            // Haal de nieuwe positie van de muis op ten opzichte van de vorige positie
-            Vector3 delta = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0);
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (!Physics.Raycast(ray, out hit)) // Als de raycast niets raakt, stop dan de functie
+            {
+                return;
+            }
+            // Verplaats het kanon naar de plek waar de raycast iets raakt
+            focusObs.transform.position = hit.point;
+        }
+        else if (Input.GetMouseButtonUp(0)) // Als de linkermuisknop wordt losgelaten
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (!Physics.Raycast(ray, out hit)) // Als de raycast niets raakt, stop dan de functie
+            {
+                return;
+            }
 
-            // Roteer de camera op basis van de muisbeweging
-            pitch -= delta.y * sensitivity;
-            pitch = Mathf.Clamp(pitch, -90f, 90f); // Beperk de pitch rotatie tussen -90 en 90 graden
+            if (hit.collider.gameObject.CompareTag("Platform")) // Als het geraakte object een platform is
+            {
+                hit.collider.gameObject.tag = "Occupied"; // Markeer het platform als bezet
+                // Bereken de top van de toren
+                float towerTop = hit.collider.gameObject.transform.position.y + hit.collider.bounds.size.y;
+                // Trek de helft van de hoogte van het kanon af en voeg de hoogte offset toe
+                towerTop -= focusObs.GetComponent<Collider>().bounds.size.y / 2 + heightOffset;
+                // Plaats het kanon op de top van de toren
+                focusObs.transform.position = new Vector3(hit.collider.gameObject.transform.position.x, towerTop, hit.collider.gameObject.transform.position.z);
+            }
+            else // Als het geraakte object geen platform is
+            {
+                // Vernietig het kanon
+                Destroy(focusObs);
+            }
 
-            // Bereken de doelrotatie van de camera
-            Quaternion targetRotation = Quaternion.Euler(pitch, transform.localEulerAngles.y + delta.x * sensitivity, 0f);
-            transform.localRotation = targetRotation; // Pas de rotatie toe op de camera
-
-            // Bereken de bewegingsrichting van de camera
-            Vector3 dir = new Vector3();
-            if (Input.GetKey(KeyCode.W)) dir += transform.forward; // Vooruit bewegen
-            if (Input.GetKey(KeyCode.S)) dir -= transform.forward; // Achteruit bewegen
-            if (Input.GetKey(KeyCode.A)) dir -= transform.right; // Naar links bewegen
-            if (Input.GetKey(KeyCode.D)) dir += transform.right; // Naar rechts bewegen
-            if (Input.GetKey(KeyCode.Space)) dir += Vector3.up; // Omhoog bewegen
-            if (Input.GetKey(KeyCode.LeftControl)) dir -= Vector3.up; // Omlaag bewegen
-
-            dir.Normalize(); // Normaliseer de richtingsvector
-            dir *= speed * Time.deltaTime; // Schaal de richtingsvector met snelheid en tijd
-
-            // Beweeg de camera
-            transform.Translate(dir, Space.World);
+            // Zet het focus object op null
+            focusObs = null;
         }
     }
 }
+```
 
+```
 ```
 
 [^1]: #### Unity Scenes Uitgelegd
