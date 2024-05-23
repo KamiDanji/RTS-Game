@@ -977,9 +977,6 @@ public class UIInterface : MonoBehaviour
 }
 ```
 
-```
-```
-
 [^1]: #### Unity Scenes Uitgelegd
 
     Unity Scenes zijn  individuele levels of stages in een game, elk met hun eigen objecten en instellingen. Ze worden gebruikt om verschillende delen van een game, zoals levels of de mainmenu, te organiseren. Hiermee kun je efficiënt tussen verschillende onderdelen van je game wisselen en het ontwikkelproces overzichtelijk houden.
